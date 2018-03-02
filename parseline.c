@@ -5,31 +5,32 @@
 #define CMAX 512 /*Command line length max*/
 #define PMAX 10  /*Pipeline command max*/
 
-void errorHandling(int argc, char *argv[])
+void getCommand()
 {
-	int i;
-	int cLen = 0;
-	/*check if commandline exceeds limits*/
-	for (i = 0; i < argc; i++) {
-		cLen += strlen(argv[i]);
-		cLen += 1; /*to handle spaces in between*/
-	}
-	cLen -= 1; /*go get rid of last space*/
+	char command[CMAX];
+	char c;
+	int idx = 0;
 
-	if (cLen > CMAX) {
-		fprintf(stderr, "Command line length too long\n");
-		exit(EXIT_FAILURE);
-	}
-	/*test for malformed redirects*/
+	printf("line: ");
 
-	/*test for ambiguous inputs or outputs*/
+	/*get command while checking if input
+	exceeds command line length max (CMAX)*/
+	while((c = getchar()) != '\n') {
+		command[idx] = c;
+		idx++;
+		if (idx > CMAX) {
+			fprintf(stderr,"Too much input");
+			exit(EXIT_FAILURE);
+		}
+	}
+
 
 }
 
-int main(int argc, char *argv[])
+int main()
 {
-	/*handle errors*/
-	errorHandling(argc, argv);
+	/*get line*/
+	getCommand();	
 
 	printf("Hello, World!\n");
 	return 0;
