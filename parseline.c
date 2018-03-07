@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #define CMAX 512 /*Command line length max*/
 #define PMAX 10  /*Pipeline command max*/
 
-char** splitStr(char *path, const char delimiter)
+/********************Helper****************/
+
+char** splitStr(char path[], const char delimiter)
 {
 	char **res = 0;
 	int count = 0;
@@ -48,12 +51,22 @@ char** splitStr(char *path, const char delimiter)
 	return res;
 }
 
+/*Test errors*/ 
+
+void getStages(char arg[], int stageNum)
+{
+	printf("--------\nStage %d: ", stageNum);
+	printf("\"%s\"\n", arg);
+	printf("--------\n");
+}
 
 void getCommand()
 {
 	char command[CMAX];
 	char c;
 	int idx = 0;
+	char **tokens;
+	int i;
 
 	printf("line: ");
 
@@ -67,7 +80,26 @@ void getCommand()
 			exit(EXIT_FAILURE);
 		}
 	}
+	command[idx] = '\0';
+
+	/*Parse commands by pipeline*/
+	tokens = splitStr(command, '|');
 	
+	/*exit if there aren't any commands*/
+	if(!tokens) {
+		fprintf(stderr, "No arguments outputed\n");
+		exit(EXIT_FAILURE);
+	}
+
+	/*loop through stages*/
+	i = 0;
+	while(*(tokens + i)) {
+		getStages(*(tokens + i), i);
+		free(*(tokens + i));
+		i++;
+	}
+
+	free(tokens);
 }
 
 int main()
