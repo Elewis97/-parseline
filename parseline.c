@@ -19,12 +19,11 @@ void getCommand()
 		command[idx] = c;
 		idx++;
 		if (idx > CMAX) {
-			fprintf(stderr,"Too much input");
+			fprintf(stderr,"command too long\n");
 			exit(EXIT_FAILURE);
 		}
 	}
-
-
+	
 }
 
 int main()
