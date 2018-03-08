@@ -137,6 +137,18 @@ void get_prev_cmd(char **tokens, int tokIdx, char buffer[]) {
 }
 
 
+void get_next_cmd(char **tokens, int tokIdx, char buffer[]) {
+
+	int i = 0;
+	char *arg = (*tokens + tokIdx + 1);
+
+	while(!isspace(arg[i])) {
+		buffer[i] = arg[i];
+		i++;
+	}
+}
+
+
 struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 {
 	struct Stage *stage = initStage();
@@ -149,6 +161,7 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 	int redir_in = -1;
 	int redir_out = -1;
 	char prev_cmd[512] = {0};
+	char next_cmd[512] = {0};
 
 	i = 0;
 
@@ -205,11 +218,12 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 		}
 	}
 	else {
+		get_next_cmd(tokens, tokIdx, next_cmd);
 		if(redir_out > 0) {
-			fprintf(stderr, " ");
+			fprintf(stderr, "%s: ambiguous output\n", next_cmd);
 		}
 		else {
-			strcpy(stage->output, (token + tokIdx + 1));
+			strcpy(stage->output, next_cmd);
 		}
 	}
 
@@ -272,11 +286,11 @@ void getStages(char arg[], int stageNum, char** tokens)
 	printf("--------\n");
 
 	/*ensure to not exceed state limit*/
-	if(stageNum >= 2) {
+	/*if(stageNum >= 2) {
 		fprintf(stderr, "output line limit (20) exceeded.\n");
 		freeRemainingTokens(tokens, stageNum);
 		exit(EXIT_FAILURE);
-	}
+	}*/
 
 	error = getCommand(arg, tokens, stageNum);
 
