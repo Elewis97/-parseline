@@ -33,20 +33,25 @@ struct Stage *initStage()
 	return stage;
 }
 
-char** splitStr(char path[], char *delimiter)
+void init_path(char ***res, int num) {
+
+	for(int i = 0; i < num; i++) {
+		*res[i] = NULL;
+	}
+}
+
+void splitStr(char path[], char *delimiter, char ***res)
 {
 	char *token = NULL;
-	char **res = malloc(sizeof(char**));
 	int i = 0;
 
 	token = strtok(path, delimiter);
 	while(token != NULL) {
-		res[i] = token;
+		*res[i] = token;
 		token = strtok(NULL, delimiter);
 		i++;
 	}
 
-	return res;
 }
 
 /*Test errors*/
@@ -183,7 +188,20 @@ void getLine()
 int main()
 {
 	/*get line*/
-	getLine();
+
+	char stuff[] = "balasdfajs asdf sdfa";
+	char *res[3];
+
+	init_path(&res, 3);
+
+	for(int i = 0; i < 3; i++) {
+		splitStr(stuff, " ", &res);
+	}
+
+	for(int i = 0; i < 3; i++) {
+		printf("%s\n", res[i]);
+	}
+/*	getLine();*/
 
 	return 0;
 }
