@@ -131,6 +131,7 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokNum,
 	for (i = 0; i < CMAX; i++)
 		tempArgv[i] = '\0';
 
+
 	while(token != NULL) {
 		if (strcmp(token, "<") != 0 &&
 			strcmp(token, ">") != 0 &&
@@ -143,11 +144,11 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokNum,
 		}
 		token = strtok(NULL, " ");
 	}
-	/*remove last two characters */
+	/*remove last comma from argv*/
 	if (strlen(tempArgv) >= 1) {
 		tempArgv[strlen(tempArgv) - 1] = '\0';
 	}
-	strcpy(stage->argv, arg);
+	strcpy(stage->argv, tempArgv);
 	printf("%10s: %d\n", "argc", count);
 	printf("%10s: %s\n", "argv", tempArgv);
 
