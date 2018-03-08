@@ -95,7 +95,6 @@ void displayStage(struct Stage *stage)
 	printf("%10s: %s\n", "argv", stage->argv);
 }
 
-<<<<<<< HEAD
 int get_redir(char **args_v, char *redir) {
 
 	int i = 0;
@@ -103,6 +102,7 @@ int get_redir(char **args_v, char *redir) {
 		if(strcmp(args_v[i], redir) == 0) {
 			return i;
 		}
+		i++;
 	}
 	return -1;
 }
@@ -112,10 +112,13 @@ void check_double_redirect(char arg[], char **args_v, char *sym) {
 	char *redir = NULL;
 
 	redir = strstr(arg, sym);
+	/*printf("readir1: %s", redir);*/
 	if(redir != NULL) {
-		redir = strstr(arg, sym);
+		redir = strstr(redir + 1, sym);
+		/*printf("readir2: %s", redir);*/
 		if(redir != NULL) {
-			fprintf(stderr, "%s: bad input redirection", args_v[0]);
+			fprintf(stderr, 
+				"%s: bad input redirection", args_v[0]);
 			exit(0);
 		}
 	}
@@ -123,10 +126,6 @@ void check_double_redirect(char arg[], char **args_v, char *sym) {
 
 
 struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
-=======
-struct Stage *fillCommand(char arg[], char **tokens, int tokNum,
-	int len)
->>>>>>> d76943a2698f8a75d24283a7c75f1498bc0bc4c3
 {
 	struct Stage *stage = initStage();
 	int count = 0;
@@ -139,16 +138,34 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokNum,
 	int redir_out = -1;
 
 	i = 0;
+
+	for (i = 0; i < CMAX; i++)
+		arg_cpy[i] = '\0';
+
 	strcpy(arg_cpy, arg);
+	token = strtok(arg_cpy, " ");
+	for (i = 0; i < CMAX; i++)
+		tempArgv[i] = '\0';
+
+	i = 0;
+	while(token != NULL) {
+		args_v[i] = token;
+		token = strtok(NULL, " ");
+		i++;
+	}
+
+	i = 0;
+	/*strcpy(arg_cpy, arg);
 	token = strtok(arg_cpy, " ");
 	while(token != NULL) {
 		if(i > 10) {
-			fprinf(stderr, "commands too long\n");
+			fprintf(stderr, 
+				"commands too long %d, %s\n", i, token);
 		}
 		args_v[i] = token;
 		strtok(NULL, " ");
 		i++;
-	}
+	}*/
 
 	check_double_redirect(arg, args_v, "<");
 	check_double_redirect(arg, args_v, ">");
@@ -166,19 +183,33 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokNum,
 	}
 	else {
 		if(redir_in > 0) {
-			fprintf(stderr, "")
+			fprintf(stderr, " ");
 		}
 		else {
-			strcpy(stage -> input, *(token + tokIdx - 1));
+			strcpy(stage -> input, (token + tokIdx - 1));
 		}
 	}
 
-	if(strstr(arg, ">") && tokIdx == len - 1) {
-
-
+	/*check for output*/
+	if (tokIdx == len - 1) {
+		if(redir_out < 0) {
+			strcpy(stage->output, "original stdout");
+		}
+		else {
+			strcpy(stage->output, args_v[redir_out + 1]);
+		}
+	}
+	else {
+		if(redir_out > 0) {
+			fprintf(stderr, " ");
+		}
+		else {
+			strcpy(stage->output, (token + tokIdx - 1));
+		}
 	}
 
-	/*check argv*/
+	printf("%10s: %s\n", "input", stage->input);
+	printf("%10s: %s\n", "output", stage->output);
 	token = strtok(arg, " ");
 	for (i = 0; i < CMAX; i++)
 		tempArgv[i] = '\0';
