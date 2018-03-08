@@ -33,7 +33,7 @@ struct Stage *initStage()
 	return stage;
 }
 
-char** splitStr(char path[], const char delimiter)
+char** splitStr(char path[], char *delimiter)
 {
 	char **res = 0;
 	int count = 0;
@@ -113,6 +113,8 @@ struct Stage *fillCommand(char arg[])
 
 	/*CHANGE THIS LATER*/
 	stage->argc = 1;
+
+	displayStage(stage);
 
 	free(stage);
 
