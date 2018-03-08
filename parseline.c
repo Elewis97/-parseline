@@ -95,7 +95,6 @@ void displayStage(struct Stage *stage)
 	printf("%10s: %s\n", "argv", stage->argv);
 }
 
-<<<<<<< HEAD
 int get_redir(char **args_v, char *redir) {
 
 	int i = 0;
@@ -121,22 +120,30 @@ void check_double_redirect(char arg[], char **args_v, char *sym) {
 	}
 }
 
+void get_prev_cmd(char **tokens, int tokIdx, char *buffer) {
+
+	int i = 0;
+	char *arg = (*tokens + tokIdx - 1);
+
+	while(!isspace(arg[i])) {
+		buffer[i] = arg[i];
+		i++;
+	}
+}
+
 
 struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
-=======
-struct Stage *fillCommand(char arg[], char **tokens, int tokNum,
-	int len)
->>>>>>> d76943a2698f8a75d24283a7c75f1498bc0bc4c3
 {
 	struct Stage *stage = initStage();
 	int count = 0;
 	char *token;
 	char tempArgv[CMAX];
 	int i;
-	char arg_cpy[512];
+	char arg_cpy[512] = {0};
 	char *args_v[10] = {NULL};
 	int redir_in = -1;
 	int redir_out = -1;
+	char *prev_cmd[512] = {0};
 
 	i = 0;
 	strcpy(arg_cpy, arg);
@@ -152,7 +159,7 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokNum,
 
 	check_double_redirect(arg, args_v, "<");
 	check_double_redirect(arg, args_v, ">");
-	
+
 	redir_in = get_redir(args_v, "<");
 	redir_out = get_redir(args_v, ">");
 
@@ -165,11 +172,12 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokNum,
 		}
 	}
 	else {
+		get_prev_cmd(tokens, tokIdx, prev_cmd);
 		if(redir_in > 0) {
-			fprintf(stderr, "")
+			fprintf(stderr, "%s: ambiguous input\n", prev_cmd)
 		}
 		else {
-			strcpy(stage -> input, *(token + tokIdx - 1));
+			strcpy(stage -> input, prev_cmd);
 		}
 	}
 
