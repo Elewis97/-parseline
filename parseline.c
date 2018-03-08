@@ -9,59 +9,23 @@
 
 /********************Helper****************/
 
-char** splitStr(char path[], const char delimiter)
+char** splitStr(char path[], char *delimiter)
 {
-	char **res = 0;
-	int count = 0;
-	char *tempPtr = path;
-	char *lastDelim = 0;
-	char delim[2];
-	int idx;
-	char *token;
+	char *token = NULL;
+	char **res = malloc(sizeof(char**));
+	int i = 0;
 
-	/*init delim*/
-	delim[0] = delimiter;
-	delim[1] = 0;
-
-	/*get number of elements*/
-	while(*tempPtr) {
-		if(delimiter == *tempPtr) {
-			count ++;
-			lastDelim = tempPtr;
-		}
-		tempPtr ++;
+	token = strtok(path, delimiter);
+	while(token != NULL) {
+		res[i] = token;
+		token = strtok(NULL, delimiter);
+		i++;
 	}
 
-	count += lastDelim	 < (path + strlen(path) - 1);
-	count ++;
-
-	res = malloc(sizeof(char*) * count);
-
-	if (res) {
-		idx = 0;
-		token = strtok(path, delim);
-
-		while(token) {
-			assert(idx < count);
-			*(res + idx++) = strdup(token);
-			token = strtok(0, delim);
-		}
-		assert(idx == count - 1);
-		*(res + idx) = 0;
-	}
 	return res;
 }
 
-void freeRemainingTokens(char **tokens, int i)
-{
-	while(*(tokens + i)) {
-		free(*(tokens + i));
-		i++;
-	}
-	free(tokens);
-}
-
-/*Test errors*/ 
+/*Test errors*/
 
 bool getCommand(char arg[])
 {
@@ -140,7 +104,7 @@ void getLine()
 
 	/*Parse commands by pipeline*/
 	tokens = splitStr(line, '|');
-	
+
 	/*exit if there aren't any commands*/
 	if(!tokens) {
 		fprintf(stderr, "No arguments outputed\n");
@@ -158,11 +122,11 @@ void getLine()
 	free(tokens);
 }
 
+
 int main()
 {
 	/*get line*/
-	getLine();	
+	getLine();
 
-	printf("Hello, World!\n");
 	return 0;
 }
