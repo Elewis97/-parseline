@@ -213,7 +213,7 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 			fprintf(stderr, "%s: ambiguous input\n", prev_cmd);
 		}
 		else {
-			snprintf(prev_cmd, 17, "pipe to stage %d", tokIdx - 1);
+			snprintf(prev_cmd, 20,"pipe from stage %d",tokIdx - 1);
 			/*pipe_num_in = (char) tokIdx - '0';
 			prev_cmd[14] = pipe_num_in;*/
 			strcpy(stage -> input, prev_cmd);
