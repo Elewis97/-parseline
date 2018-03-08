@@ -125,7 +125,7 @@ void check_double_redirect(char arg[], char **args_v, char *sym) {
 	}
 }
 
-void get_prev_cmd(char **tokens, int tokIdx, char **buffer) {
+void get_prev_cmd(char **tokens, int tokIdx, char **buffer[CMAX]) {
 
 	int i = 0;
 	char *arg = (*tokens + tokIdx - 1);
@@ -148,7 +148,7 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 	char *args_v[10] = {NULL};
 	int redir_in = -1;
 	int redir_out = -1;
-	char *prev_cmd[512] = {0};
+	char prev_cmd[512] = {0};
 
 	i = 0;
 
@@ -202,14 +202,14 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 			strcpy(stage->output, args_v[redir_out + 1]);
 		}
 	}
-	else {
+	/*else {
 		if(redir_out > 0) {
 			fprintf(stderr, " ");
 		}
 		else {
-			strcpy(stage->output, (token + tokIdx - 1));
+			strcpy(stage->output, (tokens + tokIdx + 1));
 		}
-	}
+	}*/
 
 	printf("%10s: %s\n", "input", stage->input);
 	printf("%10s: %s\n", "output", stage->output);
