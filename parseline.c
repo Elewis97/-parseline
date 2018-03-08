@@ -78,8 +78,6 @@ struct Stage *fillCommand(char arg[])
 	/*CHANGE THIS LATER*/
 	stage->argc = 1;
 
-	displayStage(stage);
-
 	free(stage);
 
 	return stage;
@@ -90,7 +88,7 @@ bool getCommand(char arg[])
 	int i;
 	char **commands;
 
-	commands = splitStr(arg, ' ');
+	commands = splitStr(arg, " ");
 
 	fillCommand(arg);
 
@@ -101,13 +99,11 @@ bool getCommand(char arg[])
 
 		/*check if arg too big*/
 		if (i > PMAX) {
-			freeRemainingTokens(commands, i);
 			exit(EXIT_FAILURE);
 		}
 		i++;
 	}
 
-	freeRemainingTokens(commands, i);
 	return false;
 }
 
@@ -121,14 +117,12 @@ void getStages(char arg[], int stageNum, char** tokens)
 	/*ensure to not exceed state limit*/
 	if(stageNum >= 2) {
 		fprintf(stderr, "output line limit (20) exceeded.\n");
-		freeRemainingTokens(tokens, stageNum);
 		exit(EXIT_FAILURE);
 	}
 
 	error = getCommand(arg);
 
 	if (error) {
-		freeRemainingTokens(tokens, stageNum);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -162,7 +156,7 @@ void getLine()
 	}
 
 	/*Parse commands by pipeline*/
-	tokens = splitStr(line, '|');
+	tokens = splitStr(line, "|");
 
 	/*exit if there aren't any commands*/
 	if(!tokens) {
