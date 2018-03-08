@@ -172,6 +172,14 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 	/*printf("arg: %s\n", arg);*/
 	/*printf("tokens: %s\n", *(tokens));*/
 
+	/*check if argument is all spaces*/
+	if (strcmp(arg, " ") == 0) {
+		fprintf(stderr, "invalid null command\n");
+		free(stage);
+		freeRemainingTokens(tokens, tokIdx);
+		exit(EXIT_FAILURE);
+	}
+
 	i = 0;
 
 	for (i = 0; i < CMAX; i++)
@@ -302,11 +310,6 @@ void getStages(char arg[], int stageNum, char** tokens)
 	printf("--------\n");
 
 	/*ensure to not exceed state limit*/
-	/*if(stageNum >= 2) {
-		fprintf(stderr, "output line limit (20) exceeded.\n");
-		freeRemainingTokens(tokens, stageNum);
-		exit(EXIT_FAILURE);
-	}*/
 
 	error = getCommand(arg, tokens, stageNum);
 
