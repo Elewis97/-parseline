@@ -63,8 +63,28 @@ void freeRemainingTokens(char **tokens, int i)
 
 /*Test errors*/ 
 
-bool getCommand(char arg)
+bool getCommand(char arg[])
 {
+	int i;
+	char **commands;
+
+	commands = splitStr(arg, ' ');
+
+	/*loop through commands*/
+	i = 0;
+	while(*(commands + i)) {
+		/*do something*/
+
+		/*check if arg too big*/
+		if (i > PMAX) {
+			freeRemainingTokens(commands, i);
+			exit(EXIT_FAILURE);
+		}
+		i++;
+	}
+
+	freeRemainingTokens(commands, i);
+	free(commands);
 	return false;
 }
 
