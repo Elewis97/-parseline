@@ -7,7 +7,31 @@
 #define CMAX 512 /*Command line length max*/
 #define PMAX 10  /*Pipeline command max*/
 
+struct Stage {
+	char input[CMAX];
+	char output[CMAX];
+	int argc;
+	char argv[CMAX];
+};
+
 /********************Helper****************/
+
+struct Stage *initStage()
+{
+	struct Stage *stage = malloc(sizeof(struct Stage));
+	char temp[CMAX];
+	int i;
+
+	for (i = 0; i < CMAX; i++) {
+		temp[i] = '\0';
+	}
+
+	strcpy(stage->input, temp);
+	strcpy(stage->output, temp);
+	strcpy(stage->argv, temp);
+
+	return stage;
+}
 
 char** splitStr(char path[], const char delimiter)
 {
@@ -63,6 +87,38 @@ void freeRemainingTokens(char **tokens, int i)
 
 /*Test errors*/ 
 
+void displayStage(struct Stage *stage) 
+{
+	printf("%10s: %s\n", "input", stage->input);
+	printf("%10s: %s\n", "output", stage->output);
+	printf("%10s: %d\n", "argc", stage->argc);
+	printf("%10s: %s\n", "argv", stage->argv);
+}
+
+struct Stage *fillCommand(char arg[])
+{
+	struct Stage *stage = initStage();
+	/*Check stdin*/
+	if (strstr(arg, "<") == NULL) {
+		strcpy(stage->input,"original stdin");
+	}
+
+	/*Check stdout*/
+	if(strstr(arg, ">") == NULL) {
+		strcpy(stage->output, "original stdout");
+	}
+
+	/*check argv*/
+	strcpy(stage->argv, arg);
+
+	/*CHANGE THIS LATER*/
+	stage->argc = 1;
+
+	free(stage);
+
+	return stage;
+}
+
 bool getCommand(char arg[])
 {
 	int i;
@@ -70,10 +126,12 @@ bool getCommand(char arg[])
 
 	commands = splitStr(arg, ' ');
 
+	fillCommand(arg);
+
 	/*loop through commands*/
 	i = 0;
 	while(*(commands + i)) {
-		/*do something*/
+		/*if stdout is valid*/
 
 		/*check if arg too big*/
 		if (i > PMAX) {
@@ -84,7 +142,6 @@ bool getCommand(char arg[])
 	}
 
 	freeRemainingTokens(commands, i);
-	free(commands);
 	return false;
 }
 
