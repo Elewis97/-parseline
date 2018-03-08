@@ -131,12 +131,21 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokNum)
 		tempArgv[i] = '\0';
 
 	while(token != NULL) {
-		snprintf(tempArgv, CMAX, "\"%s\"", token);
-		token = strtok(NULL, " ");
-		count ++;
+		if (strstr(token, "<") == NULL &&
+			strstr(token, ">") == NULL) {
+			strcat(tempArgv, "\"");
+			strcat(tempArgv, token);
+			strcat(tempArgv, "\", ");
+			token = strtok(NULL, " ");
+			count ++;
+		}
+	}
+	/*remove last two characters */
+	if (strlen(tempArgv) >= 2) {
+		tempArgv[strlen(tempArgv) - 2] = '\0';
 	}
 	strcpy(stage->argv, arg);
-	printf("%10s: %d\n", "argc", 1);
+	printf("%10s: %d\n", "argc", count);
 	printf("%10s: %s\n", "argv", tempArgv);
 
 	/*CHANGE THIS LATER*/
