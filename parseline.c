@@ -95,7 +95,8 @@ void displayStage(struct Stage *stage)
 	printf("%10s: %s\n", "argv", stage->argv);
 }
 
-struct Stage *fillCommand(char arg[], char **tokens, int tokNum)
+struct Stage *fillCommand(char arg[], char **tokens, int tokNum,
+	int len)
 {
 	struct Stage *stage = initStage();
 	int count = 0;
@@ -184,8 +185,14 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokNum)
 
 bool getCommand(char arg[], char** tokens, int tokIdx)
 {
-	int i;
-	struct Stage *stage = fillCommand(arg, tokens, tokIdx);
+	int i = 0;
+	int len = 0;
+
+	while(*(tokens + i)) {
+		len ++;
+		i++;
+	}
+	struct Stage *stage = fillCommand(arg, tokens, tokIdx, len);
 	/*displayStage(stage);*/
 	return false;
 }
