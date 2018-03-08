@@ -33,25 +33,56 @@ struct Stage *initStage()
 	return stage;
 }
 
-void init_path(char ***res, int num) {
+char** splitStr(char path[], const char delimiter)
+{
+	char **res = 0;
+	int count = 0;
+	char *tempPtr = path;
+	char *lastDelim = 0;
+	char delim[2];
+	int idx;
+	char *token;
 
-	for(int i = 0; i < num; i++) {
-		*res[i] = NULL;
+	/*init delim*/
+	delim[0] = delimiter;
+	delim[1] = 0;
+
+	/*get number of elements*/
+	while(*tempPtr) {
+		if(delimiter == *tempPtr) {
+			count ++;
+			lastDelim = tempPtr;
+		}
+		tempPtr ++;
 	}
+
+	count += lastDelim	 < (path + strlen(path) - 1);
+	count ++;
+
+	res = malloc(sizeof(char*) * count);
+
+	if (res) {
+		idx = 0;
+		token = strtok(path, delim);
+
+		while(token) {
+			assert(idx < count);
+			*(res + idx++) = strdup(token);
+			token = strtok(0, delim);
+		}
+		assert(idx == count - 1);
+		*(res + idx) = 0;
+	}
+	return res;
 }
 
-void splitStr(char path[], char *delimiter, char ***res)
+void freeRemainingTokens(char **tokens, int i)
 {
-	char *token = NULL;
-	int i = 0;
-
-	token = strtok(path, delimiter);
-	while(token != NULL) {
-		*res[i] = token;
-		token = strtok(NULL, delimiter);
+	while(*(tokens + i)) {
+		free(*(tokens + i));
 		i++;
 	}
-
+	free(tokens);
 }
 
 /*Test errors*/
@@ -64,21 +95,31 @@ void displayStage(struct Stage *stage)
 	printf("%10s: %s\n", "argv", stage->argv);
 }
 
-struct Stage *fillCommand(char arg[])
+struct Stage *fillCommand(char arg[], char **tokens, int tokNum)
 {
 	struct Stage *stage = initStage();
-	/*Check stdin*/
-	if (strstr(arg, "<") == NULL) {
-		strcpy(stage->input,"original stdin");
-	}
+	int count = 0;
+	char *token;
+	char tempArgv[CMAX];
+	int i;
 
-	/*Check stdout*/
-	if(strstr(arg, ">") == NULL) {
-		strcpy(stage->output, "original stdout");
-	}
+	
+
+
 
 	/*check argv*/
+	token = strtok(arg, " ");
+	for (i = 0; i < CMAX; i++)
+		tempArgv[i] = '\0';
+
+	while(token != NULL) {
+		snprintf(tempArgv, CMAX, "\"%s\"", token);
+		token = strtok(NULL, " ");
+		count ++;
+	}
 	strcpy(stage->argv, arg);
+	printf("%10s: %d\n", "argc", 1);
+	printf("%10s: %s\n", "argv", tempArgv);
 
 	/*CHANGE THIS LATER*/
 	stage->argc = 1;
@@ -88,22 +129,22 @@ struct Stage *fillCommand(char arg[])
 	return stage;
 }
 
-bool getCommand(char arg[])
+/*bool getCommand(char arg[])
 {
 	int i;
 	char **commands;
 
 	commands = splitStr(arg, ' ');
 
-	fillCommand(arg);
+	fillCommand(arg);*/
 
 	/*loop through commands*/
-	i = 0;
-	while(*(commands + i)) {
+	/*i = 0;
+	while(*(commands + i)) {*/
 		/*if stdout is valid*/
 
 		/*check if arg too big*/
-		if (i > PMAX) {
+		/*if (i > PMAX) {
 			freeRemainingTokens(commands, i);
 			exit(EXIT_FAILURE);
 		}
@@ -111,6 +152,14 @@ bool getCommand(char arg[])
 	}
 
 	freeRemainingTokens(commands, i);
+	return false;
+}*/
+
+bool getCommand(char arg[], char** tokens, int tokIdx)
+{
+	int i;
+	struct Stage *stage = fillCommand(arg, tokens, tokIdx);
+	/*displayStage(stage);*/
 	return false;
 }
 
@@ -128,7 +177,7 @@ void getStages(char arg[], int stageNum, char** tokens)
 		exit(EXIT_FAILURE);
 	}
 
-	error = getCommand(arg);
+	error = getCommand(arg, tokens, stageNum);
 
 	if (error) {
 		freeRemainingTokens(tokens, stageNum);
@@ -184,24 +233,10 @@ void getLine()
 	free(tokens);
 }
 
-
 int main()
 {
 	/*get line*/
-
-	char stuff[] = "balasdfajs asdf sdfa";
-	char *res[3];
-
-	init_path(&res, 3);
-
-	for(int i = 0; i < 3; i++) {
-		splitStr(stuff, " ", &res);
-	}
-
-	for(int i = 0; i < 3; i++) {
-		printf("%s\n", res[i]);
-	}
-/*	getLine();*/
+	getLine();
 
 	return 0;
 }
