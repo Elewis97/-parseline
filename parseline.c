@@ -184,7 +184,9 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 		}
 	}
 	else {
+		printf("prevCmd: %s\n", prev_cmd);
 		get_prev_cmd(tokens, tokIdx, prev_cmd);
+		printf("prevCmd: %s\n", prev_cmd);
 		if(redir_in > 0) {
 			fprintf(stderr, "%s: ambiguous input\n", prev_cmd);
 		}
@@ -202,18 +204,14 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 			strcpy(stage->output, args_v[redir_out + 1]);
 		}
 	}
-	/*else {
+	else {
 		if(redir_out > 0) {
 			fprintf(stderr, " ");
 		}
 		else {
-<<<<<<< HEAD
-			strcpy(stage->output, (tokens + tokIdx + 1));
-=======
 			strcpy(stage->output, (token + tokIdx + 1));
->>>>>>> 977e81734e700b0f59dae310f302cd316008fcd6
 		}
-	}*/
+	}
 
 	printf("%10s: %s\n", "input", stage->input);
 	printf("%10s: %s\n", "output", stage->output);
