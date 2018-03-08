@@ -125,25 +125,29 @@ void check_double_redirect(char arg[], char **args_v, char *sym) {
 	}
 }
 
-void get_prev_cmd(char **tokens, int tokIdx, char *buffer[]) {
+void get_prev_cmd(char **tokens, int tokIdx, char buffer[]) {
 
 	int i = 0;
-	char *arg = *(tokens + tokIdx - 1);
+	char *arg;
+
+	/*printf("tokens: %s", *(tokens));*/
+	arg = *(tokens + tokIdx - 1);
+	/*printf("getPrevArg: %s, (%d)\n", arg, tokIdx);*/
 
 	while(!isspace(arg[i])) {
-		*buffer[i] = arg[i];
+		buffer[i] = arg[i];
 		i++;
 	}
 }
 
 
-void get_next_cmd(char **tokens, int tokIdx, char *buffer[]) {
+void get_next_cmd(char **tokens, int tokIdx, char buffer[]) {
 
 	int i = 0;
 	char *arg = *(tokens + tokIdx + 1);
 
 	while(!isspace(arg[i])) {
-		*buffer[i] = arg[i];
+		buffer[i] = arg[i];
 		i++;
 	}
 }
@@ -162,6 +166,11 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 	int redir_out = -1;
 	char prev_cmd[512] = {0};
 	char next_cmd[512] = {0};
+	char pipe_num_in = 0;
+	char pipe_num_out = 0;
+
+	/*printf("arg: %s\n", arg);*/
+	/*printf("tokens: %s\n", *(tokens));*/
 
 	i = 0;
 
@@ -197,11 +206,16 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 		}
 	}
 	else {
-		get_prev_cmd(tokens, tokIdx, &prev_cmd);
+		/*printf("prevCmd: %s\n", prev_cmd);*/
+		get_prev_cmd(tokens, tokIdx, prev_cmd);
+		/*printf("prevCmd: %s\n", prev_cmd);*/
 		if(redir_in > 0) {
 			fprintf(stderr, "%s: ambiguous input\n", prev_cmd);
 		}
 		else {
+			snprintf(prev_cmd, 17, "pipe to stage %d", tokIdx - 1);
+			/*pipe_num_in = (char) tokIdx - '0';
+			prev_cmd[14] = pipe_num_in;*/
 			strcpy(stage -> input, prev_cmd);
 		}
 	}
@@ -216,11 +230,15 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 		}
 	}
 	else {
-		get_next_cmd(tokens, tokIdx, &next_cmd);
+		get_next_cmd(tokens, tokIdx, next_cmd);
+	/*	printf("nextCmd: %s\n", next_cmd);*/
 		if(redir_out > 0) {
 			fprintf(stderr, "%s: ambiguous output\n", next_cmd);
 		}
 		else {
+			snprintf(next_cmd, 17, "pipe to stage %d", tokIdx + 1);
+		//	pipe_num_out = (char) tokIdx - '0';
+		//	prev_cmd[14] = pipe_num_out;
 			strcpy(stage->output, next_cmd);
 		}
 	}
@@ -339,10 +357,15 @@ void getLine()
 	i = 0;
 	while(*(tokens + i)) {
 		getStages(*(tokens + i), i, tokens);
-		free(*(tokens + i));
+		/*free(*(tokens + i));*/
 		i++;
 	}
 
+	i = 0;
+	while (*(tokens + i)) {
+		free(*(tokens + i));
+		i++;
+	}
 	free(tokens);
 }
 
