@@ -125,25 +125,25 @@ void check_double_redirect(char arg[], char **args_v, char *sym) {
 	}
 }
 
-void get_prev_cmd(char **tokens, int tokIdx, char buffer[]) {
+void get_prev_cmd(char **tokens, int tokIdx, char *buffer[]) {
 
 	int i = 0;
-	char *arg = (*tokens + tokIdx - 1);
+	char *arg = *(tokens + tokIdx - 1);
 
 	while(!isspace(arg[i])) {
-		buffer[i] = arg[i];
+		*buffer[i] = arg[i];
 		i++;
 	}
 }
 
 
-void get_next_cmd(char **tokens, int tokIdx, char buffer[]) {
+void get_next_cmd(char **tokens, int tokIdx, char *buffer[]) {
 
 	int i = 0;
-	char *arg = (*tokens + tokIdx + 1);
+	char *arg = *(tokens + tokIdx + 1);
 
 	while(!isspace(arg[i])) {
-		buffer[i] = arg[i];
+		*buffer[i] = arg[i];
 		i++;
 	}
 }
@@ -197,7 +197,7 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 		}
 	}
 	else {
-		get_prev_cmd(tokens, tokIdx, prev_cmd);
+		get_prev_cmd(tokens, tokIdx, &prev_cmd);
 		if(redir_in > 0) {
 			fprintf(stderr, "%s: ambiguous input\n", prev_cmd);
 		}
@@ -216,7 +216,7 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 		}
 	}
 	else {
-		get_next_cmd(tokens, tokIdx, next_cmd);
+		get_next_cmd(tokens, tokIdx, &next_cmd);
 		if(redir_out > 0) {
 			fprintf(stderr, "%s: ambiguous output\n", next_cmd);
 		}
