@@ -95,17 +95,83 @@ void displayStage(struct Stage *stage)
 	printf("%10s: %s\n", "argv", stage->argv);
 }
 
-struct Stage *fillCommand(char arg[], char **tokens, int tokNum)
+int get_redir(char **args_v, char *redir) {
+
+	int i = 0;
+	while(i < 10 && args_v[i] != NULL) {
+		if(strcmp(args_v[i], redir) == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+void check_double_redirect(char arg[], char **args_v, char *sym) {
+
+	char *redir = NULL;
+
+	redir = strstr(arg, sym);
+	if(redir != NULL) {
+		redir = strstr(arg, sym);
+		if(redir != NULL) {
+			fprintf(stderr, "%s: bad input redirection", args_v[0]);
+			exit(0);
+		}
+	}
+}
+
+
+struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 {
 	struct Stage *stage = initStage();
 	int count = 0;
 	char *token;
 	char tempArgv[CMAX];
 	int i;
+	char arg_cpy[512];
+	char *args_v[10] = {NULL};
+	int redir_in = -1;
+	int redir_out = -1;
 
+	i = 0;
+	strcpy(arg_cpy, arg);
+	token = strtok(arg_cpy, " ");
+	while(token != NULL) {
+		if(i > 10) {
+			fprinf(stderr, "commands too long\n");
+		}
+		args_v[i] = token;
+		strtok(NULL, " ");
+		i++;
+	}
+
+	check_double_redirect(arg, args_v, "<");
+	check_double_redirect(arg, args_v, ">");
 	
+	redir_in = get_redir(args_v, "<");
+	redir_out = get_redir(args_v, ">");
+
+	if(tokIdx == 0) {
+		if(redir_in > 0) {
+			strcpy(stage -> input, args_v[redir_in + 1]);
+		}
+		else {
+			strcpy(stage -> input, "original stdin");
+		}
+	}
+	else {
+		if(redir_in > 0) {
+			fprintf(stderr, "")
+		}
+		else {
+			strcpy(stage -> input, *(token + tokIdx - 1));
+		}
+	}
+
+	if(strstr(arg, ">") && tokIdx == len - 1) {
 
 
+	}
 
 	/*check argv*/
 	token = strtok(arg, " ");
