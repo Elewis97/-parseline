@@ -95,10 +95,13 @@ void displayStage(struct Stage *stage)
 	printf("%10s: %s\n", "argv", stage->argv);
 }
 
-struct Stage *fillCommand(char arg[])
+struct Stage *fillCommand(char arg[], char **tokens, int tokNum)
 {
 	struct Stage *stage = initStage();
 	int count = 0;
+	char *token;
+	char tempArgv[CMAX];
+	int i;
 	/*Check stdin*/
 	if (strstr(arg, "<") == NULL) {
 		strcpy(stage->input,"original stdin");
@@ -123,9 +126,18 @@ struct Stage *fillCommand(char arg[])
 
 
 	/*check argv*/
+	token = strtok(arg, " ");
+	for (i = 0; i < CMAX; i++)
+		tempArgv[i] = '\0';
+
+	while(token != NULL) {
+		snprintf(tempArgv, CMAX, "\"%s\"", token);
+		token = strtok(NULL, " ");
+		count ++;
+	}
 	strcpy(stage->argv, arg);
 	printf("%10s: %d\n", "argc", 1);
-	printf("%10s: %s\n", "argv", stage->argv);
+	printf("%10s: %s\n", "argv", tempArgv);
 
 	/*CHANGE THIS LATER*/
 	stage->argc = 1;
@@ -161,10 +173,10 @@ struct Stage *fillCommand(char arg[])
 	return false;
 }*/
 
-bool getCommand(char arg[])
+bool getCommand(char arg[], char** tokens, int tokIdx)
 {
 	int i;
-	struct Stage *stage = fillCommand(arg);
+	struct Stage *stage = fillCommand(arg, tokens, tokIdx);
 	/*displayStage(stage);*/
 	return false;
 }
@@ -183,7 +195,7 @@ void getStages(char arg[], int stageNum, char** tokens)
 		exit(EXIT_FAILURE);
 	}
 
-	error = getCommand(arg);
+	error = getCommand(arg, tokens, stageNum);
 
 	if (error) {
 		freeRemainingTokens(tokens, stageNum);
