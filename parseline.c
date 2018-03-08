@@ -95,6 +95,7 @@ void displayStage(struct Stage *stage)
 	printf("%10s: %s\n", "argv", stage->argv);
 }
 
+<<<<<<< HEAD
 int get_redir(char **args_v, char *redir) {
 
 	int i = 0;
@@ -122,6 +123,10 @@ void check_double_redirect(char arg[], char **args_v, char *sym) {
 
 
 struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
+=======
+struct Stage *fillCommand(char arg[], char **tokens, int tokNum,
+	int len)
+>>>>>>> d76943a2698f8a75d24283a7c75f1498bc0bc4c3
 {
 	struct Stage *stage = initStage();
 	int count = 0;
@@ -179,12 +184,23 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 		tempArgv[i] = '\0';
 
 	while(token != NULL) {
-		snprintf(tempArgv, CMAX, "\"%s\"", token);
+		if (strcmp(token, "<") != 0 &&
+			strcmp(token, ">") != 0 &&
+			strcmp(token, stage->input) != 0 &&
+			strcmp(token, stage->output) != 0) {
+			strcat(tempArgv, "\"");
+			strcat(tempArgv, token);
+			strcat(tempArgv, "\",");
+			count ++;
+		}
 		token = strtok(NULL, " ");
-		count ++;
+	}
+	/*remove last two characters */
+	if (strlen(tempArgv) >= 1) {
+		tempArgv[strlen(tempArgv) - 1] = '\0';
 	}
 	strcpy(stage->argv, arg);
-	printf("%10s: %d\n", "argc", 1);
+	printf("%10s: %d\n", "argc", count);
 	printf("%10s: %s\n", "argv", tempArgv);
 
 	/*CHANGE THIS LATER*/
@@ -223,8 +239,14 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 
 bool getCommand(char arg[], char** tokens, int tokIdx)
 {
-	int i;
-	struct Stage *stage = fillCommand(arg, tokens, tokIdx);
+	int i = 0;
+	int len = 0;
+
+	while(*(tokens + i)) {
+		len ++;
+		i++;
+	}
+	struct Stage *stage = fillCommand(arg, tokens, tokIdx, len);
 	/*displayStage(stage);*/
 	return false;
 }
