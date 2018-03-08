@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #define CMAX 512 /*Command line length max*/
 #define PMAX 10  /*Pipeline command max*/
@@ -117,20 +118,20 @@ void check_double_redirect(char arg[], char **args_v, char *sym) {
 		redir = strstr(redir + 1, sym);
 		/*printf("readir2: %s", redir);*/
 		if(redir != NULL) {
-			fprintf(stderr, 
+			fprintf(stderr,
 				"%s: bad input redirection", args_v[0]);
 			exit(0);
 		}
 	}
 }
 
-void get_prev_cmd(char **tokens, int tokIdx, char *buffer) {
+void get_prev_cmd(char **tokens, int tokIdx, char **buffer) {
 
 	int i = 0;
 	char *arg = (*tokens + tokIdx - 1);
 
 	while(!isspace(arg[i])) {
-		buffer[i] = arg[i];
+		*buffer[i] = arg[i];
 		i++;
 	}
 }
@@ -167,17 +168,6 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 	}
 
 	i = 0;
-	/*strcpy(arg_cpy, arg);
-	token = strtok(arg_cpy, " ");
-	while(token != NULL) {
-		if(i > 10) {
-			fprintf(stderr, 
-				"commands too long %d, %s\n", i, token);
-		}
-		args_v[i] = token;
-		strtok(NULL, " ");
-		i++;
-	}*/
 
 	check_double_redirect(arg, args_v, "<");
 	check_double_redirect(arg, args_v, ">");
@@ -194,19 +184,12 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 		}
 	}
 	else {
-		get_prev_cmd(tokens, tokIdx, prev_cmd);
+		get_prev_cmd(tokens, tokIdx, &prev_cmd);
 		if(redir_in > 0) {
-<<<<<<< HEAD
-			fprintf(stderr, "%s: ambiguous input\n", prev_cmd)
+			fprintf(stderr, "%s: ambiguous input\n", prev_cmd);
 		}
 		else {
 			strcpy(stage -> input, prev_cmd);
-=======
-			fprintf(stderr, " ");
-		}
-		else {
-			strcpy(stage -> input, (token + tokIdx - 1));
->>>>>>> 11ade48eed068c8bb0afb1369b0d6e698abc4c04
 		}
 	}
 
@@ -255,39 +238,15 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 	printf("%10s: %d\n", "argc", count);
 	printf("%10s: %s\n", "argv", tempArgv);
 
+	stage->argc = count;
+
 	/*CHANGE THIS LATER*/
-	stage->argc = 1;
 
 	free(stage);
 
 	return stage;
 }
 
-/*bool getCommand(char arg[])
-{
-	int i;
-	char **commands;
-
-	commands = splitStr(arg, ' ');
-
-	fillCommand(arg);*/
-
-	/*loop through commands*/
-	/*i = 0;
-	while(*(commands + i)) {*/
-		/*if stdout is valid*/
-
-		/*check if arg too big*/
-		/*if (i > PMAX) {
-			freeRemainingTokens(commands, i);
-			exit(EXIT_FAILURE);
-		}
-		i++;
-	}
-
-	freeRemainingTokens(commands, i);
-	return false;
-}*/
 
 bool getCommand(char arg[], char** tokens, int tokIdx)
 {
