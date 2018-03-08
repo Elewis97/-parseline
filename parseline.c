@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #define CMAX 512 /*Command line length max*/
 #define PMAX 10  /*Pipeline command max*/
@@ -51,18 +52,47 @@ char** splitStr(char path[], const char delimiter)
 	return res;
 }
 
+void freeRemainingTokens(char **tokens, int i)
+{
+	while(*(tokens + i)) {
+		free(*(tokens + i));
+		i++;
+	}
+	free(tokens);
+}
+
 /*Test errors*/ 
 
-void getStages(char arg[], int stageNum)
+bool getCommand(char arg)
 {
+	return false;
+}
+
+void getStages(char arg[], int stageNum, char** tokens)
+{
+	bool error = false;
 	printf("--------\nStage %d: ", stageNum);
 	printf("\"%s\"\n", arg);
 	printf("--------\n");
+
+	/*ensure to not exceed state limit*/
+	if(stageNum >= 2) {
+		fprintf(stderr, "output line limit (20) exceeded.\n");
+		freeRemainingTokens(tokens, stageNum);
+		exit(EXIT_FAILURE);
+	}
+
+	error = getCommand(arg);
+
+	if (error) {
+		freeRemainingTokens(tokens, stageNum);
+		exit(EXIT_FAILURE);
+	}
 }
 
-void getCommand()
+void getLine()
 {
-	char command[CMAX];
+	char line[CMAX];
 	char c;
 	int idx = 0;
 	char **tokens;
@@ -73,17 +103,23 @@ void getCommand()
 	/*get command while checking if input
 	exceeds command line length max (CMAX)*/
 	while((c = getchar()) != '\n') {
-		command[idx] = c;
+		line[idx] = c;
 		idx++;
 		if (idx > CMAX) {
 			fprintf(stderr,"command too long\n");
 			exit(EXIT_FAILURE);
 		}
 	}
-	command[idx] = '\0';
+	line[idx] = '\0';
+
+	/*Check if there are any commands*/
+	if (strlen(line) <= 1) {
+		fprintf(stderr, "No command entered\n");
+		exit(EXIT_FAILURE);
+	}
 
 	/*Parse commands by pipeline*/
-	tokens = splitStr(command, '|');
+	tokens = splitStr(line, '|');
 	
 	/*exit if there aren't any commands*/
 	if(!tokens) {
@@ -94,7 +130,7 @@ void getCommand()
 	/*loop through stages*/
 	i = 0;
 	while(*(tokens + i)) {
-		getStages(*(tokens + i), i);
+		getStages(*(tokens + i), i, tokens);
 		free(*(tokens + i));
 		i++;
 	}
@@ -105,7 +141,7 @@ void getCommand()
 int main()
 {
 	/*get line*/
-	getCommand();	
+	getLine();	
 
 	printf("Hello, World!\n");
 	return 0;
