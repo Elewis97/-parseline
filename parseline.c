@@ -125,13 +125,13 @@ void check_double_redirect(char arg[], char **args_v, char *sym) {
 	}
 }
 
-void get_prev_cmd(char **tokens, int tokIdx, char **buffer[CMAX]) {
+void get_prev_cmd(char **tokens, int tokIdx, char buffer[]) {
 
 	int i = 0;
 	char *arg = (*tokens + tokIdx - 1);
 
 	while(!isspace(arg[i])) {
-		*buffer[i] = arg[i];
+		buffer[i] = arg[i];
 		i++;
 	}
 }
@@ -184,7 +184,7 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 		}
 	}
 	else {
-		get_prev_cmd(tokens, tokIdx, &prev_cmd);
+		get_prev_cmd(tokens, tokIdx, prev_cmd);
 		if(redir_in > 0) {
 			fprintf(stderr, "%s: ambiguous input\n", prev_cmd);
 		}
@@ -207,7 +207,11 @@ struct Stage *fillCommand(char arg[], char **tokens, int tokIdx, int len)
 			fprintf(stderr, " ");
 		}
 		else {
+<<<<<<< HEAD
 			strcpy(stage->output, (tokens + tokIdx + 1));
+=======
+			strcpy(stage->output, (token + tokIdx + 1));
+>>>>>>> 977e81734e700b0f59dae310f302cd316008fcd6
 		}
 	}*/
 
